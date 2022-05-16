@@ -48,7 +48,7 @@ class Authentication with ChangeNotifier {
     assert(user!.uid != null);
 
     userUid = user!.uid;
-    print('Google user uidd=>$userUid');
+    print('Google user uid=>$userUid');
     notifyListeners();
   }
 
