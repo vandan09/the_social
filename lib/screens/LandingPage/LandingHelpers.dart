@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/screens/HomePage/HomePage.dart';
+import 'package:the_social/screens/LandingPage/LandingServices.dart';
 import 'package:the_social/services/Authentication.dart';
 
 class LandingHelpers with ChangeNotifier {
@@ -63,7 +64,11 @@ class LandingHelpers with ChangeNotifier {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              //email
               GestureDetector(
+                onTap: () {
+                  emailAuthSheet(context);
+                },
                 child: Container(
                   child: Icon(
                     EvaIcons.emailOutline,
@@ -79,6 +84,7 @@ class LandingHelpers with ChangeNotifier {
                   ),
                 ),
               ),
+              //google
               GestureDetector(
                 onTap: () {
                   print('Sign in With Google');
@@ -147,5 +153,67 @@ class LandingHelpers with ChangeNotifier {
             ],
           ),
         ));
+  }
+
+  emailAuthSheet(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  child: Divider(
+                    thickness: 4,
+                    color: constantColors.whiteColor,
+                  ),
+                ),
+                Provider.of<LandingService>(context, listen: false)
+                    .passwordLessSignIn(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    MaterialButton(
+                      color: constantColors.blueColor,
+                      child: Text(
+                        'Log in',
+                        style: TextStyle(
+                            color: constantColors.whiteColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () {
+                        Provider.of<LandingService>(context, listen: false)
+                            .logInSheet(context);
+                      },
+                    ),
+                    MaterialButton(
+                      color: constantColors.redColor,
+                      child: Text(
+                        'Sign in',
+                        style: TextStyle(
+                            color: constantColors.whiteColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () {
+                        Provider.of<LandingService>(context, listen: false)
+                            .signInSheet(context);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: constantColors.blueGreyColor,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15))),
+          );
+        });
   }
 }
