@@ -19,7 +19,7 @@ class LandingService with ChangeNotifier {
   TextEditingController passwordController = TextEditingController();
 
   shwoUserAvatar(BuildContext context) {
-    return showBottomSheet(
+    return showModalBottomSheet(
         context: context,
         builder: (context) {
           return Container(
@@ -33,49 +33,59 @@ class LandingService with ChangeNotifier {
                   color: constantColors.whiteColor,
                 ),
               ),
+              SizedBox(
+                height: 10,
+              ),
               CircleAvatar(
                 backgroundColor: constantColors.transperant,
-                radius: 80,
+                radius: 70,
                 backgroundImage: FileImage(
                     Provider.of<LandingUtils>(context, listen: false)
                         .userAvatar),
               ),
+              SizedBox(
+                height: 10,
+              ),
               Container(
-                child: Row(children: [
-                  MaterialButton(
-                      child: Text(
-                        'Reselect',
-                        style: TextStyle(
-                            color: constantColors.whiteColor,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: constantColors.whiteColor),
-                      ),
-                      onPressed: () {
-                        Provider.of<LandingUtils>(context, listen: false)
-                            .pickUserAvatar(context, ImageSource.gallery);
-                      }),
-                  MaterialButton(
-                      color: constantColors.blueColor,
-                      child: Text(
-                        'Confirm Image',
-                        style: TextStyle(
-                          color: constantColors.whiteColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        Provider.of<FirebaseOperations>(context, listen: false)
-                            .uploadUserAvatar(context)
-                            .whenComplete(() {
-                          signInSheet(context);
-                        });
-                      })
-                ]),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      MaterialButton(
+                          color: constantColors.redColor,
+                          child: Text(
+                            'Reselect',
+                            style: TextStyle(
+                                color: constantColors.whiteColor,
+                                fontWeight: FontWeight.bold,
+                                // decoration: TextDecoration.underline,
+                                decorationColor: constantColors.whiteColor),
+                          ),
+                          onPressed: () {
+                            Provider.of<LandingUtils>(context, listen: false)
+                                .pickUserAvatar(context, ImageSource.gallery);
+                          }),
+                      MaterialButton(
+                          color: constantColors.blueColor,
+                          child: Text(
+                            'Confirm Image',
+                            style: TextStyle(
+                              color: constantColors.whiteColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            Provider.of<FirebaseOperations>(context,
+                                    listen: false)
+                                .uploadUserAvatar(context)
+                                .whenComplete(() {
+                              signInSheet(context);
+                            });
+                          })
+                    ]),
               )
             ]),
             decoration: BoxDecoration(
-                color: constantColors.blueColor,
+                color: constantColors.blueGreyColor,
                 borderRadius: BorderRadius.circular(15)),
           );
         });
@@ -99,14 +109,15 @@ class LandingService with ChangeNotifier {
                 return ListTile(
                   trailing: IconButton(
                     icon: Icon(
-                      FontAwesomeIcons.trashAlt,
+                      FontAwesomeIcons.trashCan,
                       color: constantColors.redColor,
                     ),
                     onPressed: () {},
                   ),
                   leading: CircleAvatar(
                     backgroundColor: constantColors.transperant,
-                    backgroundImage: NetworkImage(documentSnapshot['image']),
+                    backgroundImage:
+                        NetworkImage(documentSnapshot['userimage']),
                   ),
                   subtitle: Text(
                     documentSnapshot['useremail'],
