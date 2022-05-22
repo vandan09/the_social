@@ -47,6 +47,7 @@ dependencies:
   cloud_firestore: ^3.1.15
   custom_navigation_bar: ^0.8.2
   fluttertoast: ^8.0.9
+  cached_network_image: ^3.2.1
   
 
 dev_dependencies:

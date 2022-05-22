@@ -41,7 +41,9 @@ class HomePageHelpers with ChangeNotifier {
                 icon: CircleAvatar(
                   backgroundColor: constantColors.blueGreyColor,
                   radius: 20,
-                  // backgroundImage:NetworkImage(Provider.of<FirebaseOperations>(context,listen: false).) ,
+                  backgroundImage: NetworkImage(
+                      Provider.of<FirebaseOperations>(context, listen: false)
+                          .getinitiUserImage as String),
                 ),
                 label: 'Profile'),
           ]),

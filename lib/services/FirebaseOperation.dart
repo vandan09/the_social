@@ -13,6 +13,10 @@ class FirebaseOperations with ChangeNotifier {
   String? initUserImage;
 
   late UploadTask imageUploadTask;
+  String? get getinitiUserName => initUserName;
+  String? get getinitiUserEmail => initUserEmail;
+  String? get getinitiUserImage => initUserImage;
+
   Future uploadUserAvatar(BuildContext context) async {
     Reference imageReference = FirebaseStorage.instance.ref().child(
         'userProfileAvatar/${Provider.of<LandingUtils>(context, listen: false).getUserAvatar.path}/${TimeOfDay.now()}');
@@ -53,5 +57,9 @@ class FirebaseOperations with ChangeNotifier {
       print(initUserImage);
       notifyListeners();
     });
+  }
+
+  Future uploadPostData(String postId, dynamic data) async {
+    return FirebaseFirestore.instance.collection('post').doc(postId).set(data);
   }
 }

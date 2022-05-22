@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_social/constants/Constantcolors.dart';
+import 'package:the_social/feed/feedHelpers.dart';
 import 'package:the_social/profile/profileHelpers.dart';
 import 'package:the_social/screens/HomePage/HomePageHelpers.dart';
 import 'package:the_social/screens/LandingPage/LandingHelpers.dart';
@@ -10,6 +11,7 @@ import 'package:the_social/screens/LandingPage/LandingUtils.dart';
 import 'package:the_social/screens/SpalshScreen/Spalshscreen.dart';
 import 'package:the_social/services/Authentication.dart';
 import 'package:the_social/services/FirebaseOperation.dart';
+import 'package:the_social/utils/UploadPost.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => FeedHelpers()),
+          ChangeNotifierProvider(create: (_) => UploadPost()),
           ChangeNotifierProvider(create: (_) => ProfileHelpers()),
           ChangeNotifierProvider(create: (_) => HomePageHelpers()),
           ChangeNotifierProvider(create: (_) => LandingUtils()),
