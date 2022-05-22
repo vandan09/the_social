@@ -5,6 +5,7 @@ import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/feed/feed.dart';
 import 'package:the_social/profile/profile.dart';
 import 'package:the_social/screens/HomePage/HomePageHelpers.dart';
+import 'package:the_social/services/FirebaseOperation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,6 +18,15 @@ class _HomePageState extends State<HomePage> {
   ConstantColors constantColors = ConstantColors();
   final PageController homepageController = PageController();
   int pageIndex = 0;
+
+  @override
+  void initState() {
+    Provider.of<FirebaseOperations>(context, listen: false)
+        .initUserData(context);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       bottomNavigationBar: Provider.of<HomePageHelpers>(context, listen: false)
-          .bottomNavBar(pageIndex, homepageController),
+          .bottomNavBar(context, pageIndex, homepageController),
     );
   }
 }

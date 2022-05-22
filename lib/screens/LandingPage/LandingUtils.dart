@@ -18,7 +18,7 @@ class LandingUtils with ChangeNotifier {
   String? get getUserAvatarUrl => userAvatarUrl;
 
   Future pickUserAvatar(BuildContext context, ImageSource source) async {
-    final pickedUserAvatar = await picker.getImage(source: source);
+    final pickedUserAvatar = await picker.pickImage(source: source);
     pickedUserAvatar == null
         ? print('Select Image')
         : userAvatar = File(pickedUserAvatar.path);

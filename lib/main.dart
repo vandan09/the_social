@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_social/constants/Constantcolors.dart';
+import 'package:the_social/profile/profileHelpers.dart';
 import 'package:the_social/screens/HomePage/HomePageHelpers.dart';
 import 'package:the_social/screens/LandingPage/LandingHelpers.dart';
 import 'package:the_social/screens/LandingPage/LandingServices.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => ProfileHelpers()),
           ChangeNotifierProvider(create: (_) => HomePageHelpers()),
           ChangeNotifierProvider(create: (_) => LandingUtils()),
           ChangeNotifierProvider(create: (_) => FirebaseOperations()),

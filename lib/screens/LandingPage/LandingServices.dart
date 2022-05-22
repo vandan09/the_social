@@ -161,6 +161,7 @@ class LandingService with ChangeNotifier {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: TextField(
+                    textInputAction: TextInputAction.next,
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Enter email',
@@ -178,6 +179,7 @@ class LandingService with ChangeNotifier {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: TextField(
+                    obscureText: true,
                     controller: passwordController,
                     decoration: InputDecoration(
                       hintText: 'Enter password',
@@ -201,15 +203,8 @@ class LandingService with ChangeNotifier {
                     onPressed: () {
                       if (emailController.text.isNotEmpty) {
                         Provider.of<Authentication>(context, listen: false)
-                            .logIntoAccount(
-                                emailController.text, passwordController.text)
-                            .whenComplete(() {
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: HomePage(),
-                                  type: PageTransitionType.bottomToTop));
-                        });
+                            .logIntoAccount(context, emailController.text,
+                                passwordController.text);
                       } else {
                         warningText(context, 'Fill all the data');
                       }
@@ -320,21 +315,12 @@ class LandingService with ChangeNotifier {
                         if (emailController.text.isNotEmpty) {
                           Provider.of<Authentication>(context, listen: false)
                               .createAccount(
-                                  emailController.text, passwordController.text)
+                                  context,
+                                  emailController.text,
+                                  passwordController.text,
+                                  usernameController.text)
+                              .whenComplete(() {})
                               .whenComplete(() {
-                            Provider.of<FirebaseOperations>(context,
-                                    listen: false)
-                                .createUserCollection(context, {
-                              'userid': Provider.of<Authentication>(context,
-                                      listen: false)
-                                  .getuserUid,
-                              'useremail': emailController.text,
-                              'username': usernameController.text,
-                              'userimage': Provider.of<LandingUtils>(context,
-                                      listen: false)
-                                  .getUserAvatarUrl,
-                            });
-                          }).whenComplete(() {
                             Navigator.pushReplacement(
                                 context,
                                 PageTransition(
