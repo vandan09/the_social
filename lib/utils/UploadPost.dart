@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -28,11 +29,11 @@ class UploadPost with ChangeNotifier {
     uploadPostImageVal == null
         ? print('Select Image')
         : uploadPostImage = File(uploadPostImageVal.path);
-    print(uploadPostImageVal!.path);
+    // print(uploadPostImageVal!.path);
 
     uploadPostImage != null
         ? showPostImage(context)
-        : print("Image Upload Error");
+        : Fluttertoast.showToast(msg: "Image Upload Error");
     notifyListeners();
   }
 
@@ -79,6 +80,7 @@ class UploadPost with ChangeNotifier {
                         color: constantColors.blueColor,
                         onPressed: () {
                           pickUploadPostImage(context, ImageSource.gallery);
+                          // Navigator.pop(context);
                         },
                         child: Text(
                           'Gallery',
@@ -91,6 +93,7 @@ class UploadPost with ChangeNotifier {
                         color: constantColors.blueColor,
                         onPressed: () {
                           pickUploadPostImage(context, ImageSource.camera);
+                          // Navigator.pop(context);
                         },
                         child: Text(
                           'Camera',

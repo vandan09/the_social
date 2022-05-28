@@ -17,11 +17,16 @@ class _FeedState extends State<Feed> {
   ConstantColors constantColors = ConstantColors();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: constantColors.blueGreyColor,
-      drawer: Drawer(),
-      appBar: Provider.of<FeedHelpers>(context, listen: false).appBar(context),
-      body: Provider.of<FeedHelpers>(context, listen: false).feedBody(context),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: constantColors.blueGreyColor,
+        drawer: Drawer(),
+        appBar:
+            Provider.of<FeedHelpers>(context, listen: false).appBar(context),
+        body: SingleChildScrollView(
+            child: Provider.of<FeedHelpers>(context, listen: false)
+                .feedBody(context)),
+      ),
     );
   }
 }

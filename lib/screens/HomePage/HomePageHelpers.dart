@@ -42,8 +42,7 @@ class HomePageHelpers with ChangeNotifier {
                   backgroundColor: constantColors.blueGreyColor,
                   radius: 20,
                   backgroundImage: NetworkImage(
-                      Provider.of<FirebaseOperations>(context, listen: false)
-                          .getinitiUserImage as String),
+                      '${Provider.of<FirebaseOperations>(context, listen: false).getinitiUserImage}'),
                 ),
                 label: 'Profile'),
           ]),

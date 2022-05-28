@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,6 +18,32 @@ class LandingService with ChangeNotifier {
   TextEditingController emailController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  toast(String msg) {
+    return Fluttertoast.showToast(
+        msg: msg,
+        backgroundColor: constantColors.whiteColor,
+        textColor: constantColors.darkColor);
+  }
+
+  validator(String name, email, String passwords) {
+    if (name.length < 3) {
+      toast('Enter valid name');
+      return false;
+    }
+    if (passwords.length < 6) {
+      toast('Enter valid password, minimum length must be 6');
+      return false;
+    }
+    if (!RegExp(
+            "^[a-zA-Z0-9.!#\$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*\$")
+        .hasMatch(email)) {
+      ('Enter valid email');
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   shwoUserAvatar(BuildContext context) {
     return showModalBottomSheet(
@@ -107,15 +134,54 @@ class LandingService with ChangeNotifier {
                   children: snapshot.data!.docs
                       .map((DocumentSnapshot documentSnapshot) {
                 return ListTile(
-                  trailing: IconButton(
-                    icon: Icon(
-                      FontAwesomeIcons.trashCan,
-                      color: constantColors.redColor,
+                  trailing: Container(
+                    width: 120,
+                    height: 20,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.check,
+                            color: constantColors.blueColor,
+                          ),
+                          onPressed: () {
+                            Provider.of<Authentication>(context, listen: false)
+                                .logIntoAccount(
+                              context,
+                              documentSnapshot['useremail'],
+                              documentSnapshot['userpassword'],
+                            )
+                                .whenComplete(() {
+                              Navigator.pushReplacement(
+                                      context,
+                                      PageTransition(
+                                          child: HomePage(),
+                                          type: PageTransitionType.leftToRight))
+                                  .whenComplete(() => toast('Logged in'));
+                            });
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.trashCan,
+                            color: constantColors.redColor,
+                          ),
+                          onPressed: () {
+                            Provider.of<FirebaseOperations>(context,
+                                    listen: false)
+                                .deleteUserData(
+                                    documentSnapshot['userid'] as String)
+                                .whenComplete(() {
+                              toast('Account deleted');
+                            });
+                          },
+                        ),
+                      ],
                     ),
-                    onPressed: () {},
                   ),
                   leading: CircleAvatar(
-                    backgroundColor: constantColors.transperant,
+                    backgroundColor: constantColors.darkColor,
                     backgroundImage:
                         NetworkImage(documentSnapshot['userimage']),
                   ),
@@ -123,7 +189,7 @@ class LandingService with ChangeNotifier {
                     documentSnapshot['useremail'],
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: constantColors.greenColor,
+                        color: constantColors.whiteColor,
                         fontSize: 12),
                   ),
                   title: Text(
@@ -256,6 +322,7 @@ class LandingService with ChangeNotifier {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: TextField(
                     controller: usernameController,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       hintText: 'Enter name',
                       hintStyle: TextStyle(
@@ -272,6 +339,7 @@ class LandingService with ChangeNotifier {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: TextField(
+                    textInputAction: TextInputAction.next,
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Enter email',
@@ -312,15 +380,29 @@ class LandingService with ChangeNotifier {
                         color: constantColors.whiteColor,
                       ),
                       onPressed: () {
-                        if (emailController.text.isNotEmpty) {
+                        if (validator(usernameController.text,
+                            emailController.text, passwordController.text)) {
                           Provider.of<Authentication>(context, listen: false)
                               .createAccount(
                                   context,
                                   emailController.text,
                                   passwordController.text,
                                   usernameController.text)
-                              .whenComplete(() {})
                               .whenComplete(() {
+                            Provider.of<FirebaseOperations>(context,
+                                    listen: false)
+                                .createUserCollection(context, {
+                              'userpassword': passwordController.text,
+                              'userid': Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getuserUid,
+                              'useremail': emailController.text,
+                              'username': usernameController.text,
+                              'userimage': Provider.of<LandingUtils>(context,
+                                      listen: false)
+                                  .getUserAvatarUrl,
+                            });
+                          }).whenComplete(() {
                             Navigator.pushReplacement(
                                 context,
                                 PageTransition(
@@ -328,7 +410,7 @@ class LandingService with ChangeNotifier {
                                     type: PageTransitionType.bottomToTop));
                           });
                         } else {
-                          warningText(context, 'Fill all the data');
+                          warningText(context, 'Fill all valid the data');
                         }
                       }),
                 ),

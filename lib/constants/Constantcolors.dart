@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class ConstantColors {
   final Color lightColor = Color(0xff6c788a);
   final Color darkColor = Color(0xFF100E20);
@@ -7,6 +8,8 @@ class ConstantColors {
   final Color redColor = Colors.red;
   final Color whiteColor = Colors.white;
   final Color blueGreyColor = Colors.blueGrey.shade900;
+  final Color lightblueGreyColor = Colors.blueGrey.shade600;
+
   final Color greenColor = Colors.greenAccent;
   final Color yellowColor = Colors.yellow;
   final Color transperant = Colors.transparent;
