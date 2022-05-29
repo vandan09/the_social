@@ -11,6 +11,7 @@ import 'package:the_social/screens/LandingPage/LandingUtils.dart';
 import 'package:the_social/screens/SpalshScreen/Spalshscreen.dart';
 import 'package:the_social/services/Authentication.dart';
 import 'package:the_social/services/FirebaseOperation.dart';
+import 'package:the_social/utils/PostOptions.dart';
 import 'package:the_social/utils/UploadPost.dart';
 
 void main() async {
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => PostFunctions()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => UploadPost()),
           ChangeNotifierProvider(create: (_) => ProfileHelpers()),

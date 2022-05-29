@@ -64,6 +64,10 @@ class FirebaseOperations with ChangeNotifier {
   }
 
   Future deleteUserData(String userid) async {
-    return FirebaseFirestore.instance.collection('user').doc(userid).delete();
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(userid)
+        .delete()
+        .then((value) => null);
   }
 }

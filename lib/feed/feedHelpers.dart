@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/services/Authentication.dart';
+import 'package:the_social/utils/PostOptions.dart';
 import 'package:the_social/utils/UploadPost.dart';
 
 class FeedHelpers with ChangeNotifier {
@@ -220,44 +221,130 @@ class FeedHelpers with ChangeNotifier {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 30.0),
-                          child: Container(
-                            height: 30,
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    child: Icon(
+                          child: GestureDetector(
+                            onLongPress: () {
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .showLikes(
+                                      context, documnetSnapshot['caption']);
+                            },
+                            onTap: (() {
+                              print('added like');
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .addLikes(
+                                      context,
+                                      documnetSnapshot['caption'],
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getuserUid);
+                            }),
+                            child: Container(
+                              height: 30,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
                                       FontAwesomeIcons.heart,
                                       color: constantColors.redColor,
                                       size: 22,
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                      '0',
-                                      style: TextStyle(
-                                          color: constantColors.whiteColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                ]),
+                                    StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('posts')
+                                            .doc(documnetSnapshot['caption'])
+                                            .collection('likes')
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          } else {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0),
+                                              child: Text(
+                                                snapshot.data!.docs.length
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    color: constantColors
+                                                        .whiteColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                            );
+                                          }
+                                        })
+                                  ]),
+                            ),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 30.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .showCommentSheet(context, documnetSnapshot,
+                                      documnetSnapshot['caption']);
+                            },
+                            child: Container(
+                              height: 30,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.comment,
+                                      color: constantColors.blueColor,
+                                      size: 22,
+                                    ),
+                                    StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('posts')
+                                            .doc(documnetSnapshot['caption'])
+                                            .collection('comments')
+                                            .snapshots(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          } else {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0),
+                                              child: Text(
+                                                snapshot.data!.docs.length
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    color: constantColors
+                                                        .whiteColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                            );
+                                          }
+                                        })
+                                  ]),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Provider.of<PostFunctions>(context, listen: false)
+                                .showRewards(context);
+                          },
                           child: Container(
                             height: 30,
                             child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  GestureDetector(
-                                    child: Icon(
-                                      FontAwesomeIcons.comment,
-                                      color: constantColors.blueColor,
-                                      size: 22,
-                                    ),
+                                  Icon(
+                                    FontAwesomeIcons.award,
+                                    color: constantColors.yellowColor,
+                                    size: 22,
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
@@ -271,30 +358,6 @@ class FeedHelpers with ChangeNotifier {
                                   ),
                                 ]),
                           ),
-                        ),
-                        Container(
-                          height: 30,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  child: Icon(
-                                    FontAwesomeIcons.award,
-                                    color: constantColors.yellowColor,
-                                    size: 22,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    '0',
-                                    style: TextStyle(
-                                        color: constantColors.whiteColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              ]),
                         ),
                         // Spacer(),
                       ],

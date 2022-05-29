@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -180,10 +181,27 @@ class LandingService with ChangeNotifier {
                       ],
                     ),
                   ),
-                  leading: CircleAvatar(
-                    backgroundColor: constantColors.darkColor,
-                    backgroundImage:
-                        NetworkImage(documentSnapshot['userimage']),
+                  leading: CachedNetworkImage(
+                    width: 40,
+                    height: 40,
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: 80.0,
+                      height: 80.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    progressIndicatorBuilder: (context, url, progress) =>
+                        Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5,
+                        color: constantColors.greenColor,
+                        value: progress.progress,
+                      ),
+                    ),
+                    imageUrl: documentSnapshot['userimage'],
                   ),
                   subtitle: Text(
                     documentSnapshot['useremail'],
