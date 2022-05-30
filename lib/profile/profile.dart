@@ -65,7 +65,7 @@ class _ProfileState extends State<Profile> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 2,
           width: MediaQuery.of(context).size.width,
           child: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
@@ -85,6 +85,8 @@ class _ProfileState extends State<Profile> {
                         .headerProfiel(context, snapshot.data!),
                     Provider.of<ProfileHelpers>(context, listen: false)
                         .divider(),
+                    Provider.of<ProfileHelpers>(context, listen: false)
+                        .middelProfile(context, snapshot),
                     Provider.of<ProfileHelpers>(context, listen: false)
                         .footerProfile(context, snapshot),
                   ],

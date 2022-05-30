@@ -303,6 +303,30 @@ class UploadPost with ChangeNotifier {
                           Provider.of<Authentication>(context, listen: false)
                               .getuserUid,
                       'time': Timestamp.now()
+                    }).whenComplete(() async {
+                      FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(Provider.of<Authentication>(context,
+                                  listen: false)
+                              .getuserUid)
+                          .collection('posts')
+                          .add({
+                        'postimage': getUploadPostImageUrl,
+                        'caption': captioController.text,
+                        'username': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .initUserName,
+                        'userimage': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .initUserImage,
+                        'useremail': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .initUserEmail,
+                        'useruid':
+                            Provider.of<Authentication>(context, listen: false)
+                                .getuserUid,
+                        'time': Timestamp.now()
+                      });
                     }).whenComplete(() {
                       Navigator.pop(context);
                     });

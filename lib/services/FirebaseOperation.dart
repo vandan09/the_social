@@ -77,4 +77,22 @@ class FirebaseOperations with ChangeNotifier {
         .doc(postId)
         .update(data);
   }
+
+  Future followUser(String followingUid, followingDocId, dynamic followingData,
+      String followerUid, followerDocId, dynamic followerData) {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(followingUid)
+        .collection('followers')
+        .doc(followingDocId)
+        .set(followingData)
+        .whenComplete(() async {
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(followerUid)
+          .collection('following')
+          .doc(followerDocId)
+          .set(followerData);
+    });
+  }
 }

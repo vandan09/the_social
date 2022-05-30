@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -234,17 +235,22 @@ class PostFunctions with ChangeNotifier {
 
   Future<bool> checkLikes(
       BuildContext context, String postId, subPostId) async {
-    bool check = false;
-    FirebaseFirestore.instance
+    var boolsnapshot = FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
         .collection('likes')
-        .doc(postId)
-        .get()
-        .then((sub) => {
-              if (sub.data()!.length > 0) {check = true}
-            });
-    return check;
+        .get(subPostId);
+
+    if (boolsnapshot.toString().length == 0) {
+      notifyListeners();
+      print(boolsnapshot.toString().length);
+      return false;
+    } else {
+      notifyListeners();
+      print(boolsnapshot.toString().length);
+
+      return true;
+    }
   }
 
   Future addComment(BuildContext context, String postId, comment) async {

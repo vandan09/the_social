@@ -30,7 +30,7 @@ class _AltProfileState extends State<AltProfile> {
           .appBarAltProfile(context),
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 2,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             color: constantColors.blueGreyColor.withOpacity(0.6),
@@ -56,6 +56,8 @@ class _AltProfileState extends State<AltProfile> {
                         .headerProfile(context, snapshot, useruid),
                     Provider.of<AtlProfileHelpers>(context, listen: false)
                         .divider(),
+                    Provider.of<AtlProfileHelpers>(context, listen: false)
+                        .middelProfile(context, snapshot),
                     Provider.of<AtlProfileHelpers>(context, listen: false)
                         .footerProfile(context, snapshot),
                   ],
