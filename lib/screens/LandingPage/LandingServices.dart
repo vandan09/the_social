@@ -172,7 +172,7 @@ class LandingService with ChangeNotifier {
                             Provider.of<FirebaseOperations>(context,
                                     listen: false)
                                 .deleteUserData(
-                                    documentSnapshot['userid'] as String)
+                                    documentSnapshot['userid'], 'users')
                                 .whenComplete(() {
                               toast('Account deleted');
                             });

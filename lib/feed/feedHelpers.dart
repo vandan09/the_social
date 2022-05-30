@@ -3,9 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:the_social/Altprofile/alt_profile.dart';
 import 'package:the_social/constants/Constantcolors.dart';
+import 'package:the_social/profile/profile.dart';
 import 'package:the_social/services/Authentication.dart';
 import 'package:the_social/utils/PostOptions.dart';
 import 'package:the_social/utils/UploadPost.dart';
@@ -30,7 +34,7 @@ class FeedHelpers with ChangeNotifier {
       ],
       title: RichText(
         text: TextSpan(
-            text: 'My ',
+            text: 'Social ',
             style: TextStyle(
               color: constantColors.whiteColor,
               fontWeight: FontWeight.bold,
@@ -38,7 +42,7 @@ class FeedHelpers with ChangeNotifier {
             ),
             children: [
               TextSpan(
-                text: 'Profile',
+                text: 'Feed',
                 style: TextStyle(
                   color: constantColors.blueColor,
                   fontWeight: FontWeight.bold,
@@ -54,7 +58,10 @@ class FeedHelpers with ChangeNotifier {
     return SingleChildScrollView(
       child: Container(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('post').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('posts')
+              .orderBy('time', descending: true)
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -82,6 +89,8 @@ class FeedHelpers with ChangeNotifier {
           shrinkWrap: true,
           children:
               snapshot.data!.docs.map((DocumentSnapshot documnetSnapshot) {
+            Provider.of<PostFunctions>(context, listen: false)
+                .showIimeAgo(documnetSnapshot['time']);
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 15.0),
               child: Container(
@@ -102,51 +111,145 @@ class FeedHelpers with ChangeNotifier {
                             width: 20,
                           ),
                           //userimage
-                          CachedNetworkImage(
-                            width: 40,
-                            height: 40,
-                            imageBuilder: (context, imageProvider) => Container(
-                              width: 80.0,
-                              height: 80.0,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    image: imageProvider, fit: BoxFit.cover),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor:
+                                          constantColors.transperant,
+                                      actions: [
+                                        Center(
+                                            child: CircularProgressIndicator(
+                                          color: constantColors.blueColor,
+                                        ))
+                                      ],
+                                    );
+                                  });
+                              if (documnetSnapshot['useruid'] !=
+                                  Provider.of<Authentication>(context,
+                                          listen: false)
+                                      .getuserUid) {
+                                SchedulerBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AltProfile(
+                                        useruid: documnetSnapshot['useruid'],
+                                      ),
+                                    ),
+                                  ).whenComplete(() {
+                                    Navigator.pop(context);
+                                  });
+                                });
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Profile(),
+                                  ),
+                                ).whenComplete(() {
+                                  Navigator.pop(context);
+                                });
+                                ;
+                              }
+                            },
+                            child: CachedNetworkImage(
+                              width: 40,
+                              height: 40,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                width: 80.0,
+                                height: 80.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: imageProvider, fit: BoxFit.cover),
+                                ),
                               ),
-                            ),
-                            progressIndicatorBuilder:
-                                (context, url, progress) => Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 5,
-                                color: constantColors.greenColor,
-                                value: progress.progress,
+                              progressIndicatorBuilder:
+                                  (context, url, progress) => Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 5,
+                                  color: constantColors.greenColor,
+                                  value: progress.progress,
+                                ),
                               ),
+                              imageUrl: documnetSnapshot['userimage'],
                             ),
-                            imageUrl: documnetSnapshot['userimage'],
                           ),
-                          //caption username time
+                          //username time
                           Padding(
                             padding:
                                 const EdgeInsets.only(left: 10.0, bottom: 20),
-                            child: SizedBox(
-                              // height: MediaQuery.of(context).size.height * 0.09,
-                              width: MediaQuery.of(context).size.width * 0.6,
-                              child: RichText(
-                                text: TextSpan(
-                                    text: documnetSnapshot['username'],
-                                    style: TextStyle(
-                                        color: constantColors.blueColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                        text: ' , 12 hours ago',
-                                        style: TextStyle(
-                                          color: constantColors.lightColor
-                                              .withOpacity(0.8),
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        backgroundColor:
+                                            constantColors.transperant,
+                                        actions: [
+                                          Center(
+                                              child: CircularProgressIndicator(
+                                            color: constantColors.blueColor,
+                                          ))
+                                        ],
+                                      );
+                                    });
+                                if (documnetSnapshot['useruid'] !=
+                                    Provider.of<Authentication>(context,
+                                            listen: false)
+                                        .getuserUid) {
+                                  SchedulerBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AltProfile(
+                                          useruid: documnetSnapshot['useruid'],
                                         ),
-                                      )
-                                    ]),
+                                      ),
+                                    ).whenComplete(() {
+                                      Navigator.pop(context);
+                                    });
+                                    ;
+                                  });
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Profile(),
+                                    ),
+                                  ).whenComplete(() {
+                                    Navigator.pop(context);
+                                  });
+                                }
+                              },
+                              child: SizedBox(
+                                // height: MediaQuery.of(context).size.height * 0.09,
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                child: RichText(
+                                  text: TextSpan(
+                                      text: documnetSnapshot['username'],
+                                      style: TextStyle(
+                                          color: constantColors.blueColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text:
+                                              ' , ${Provider.of<PostFunctions>(context, listen: false).imageTimePosted.toString()}',
+                                          style: TextStyle(
+                                            color: constantColors.lightColor
+                                                .withOpacity(0.8),
+                                          ),
+                                        )
+                                      ]),
+                                ),
                               ),
                             ),
                           ),
@@ -158,7 +261,12 @@ class FeedHelpers with ChangeNotifier {
                                       .getuserUid ==
                                   documnetSnapshot['useruid']
                               ? IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Provider.of<PostFunctions>(context,
+                                            listen: false)
+                                        .showOptions(context,
+                                            documnetSnapshot['caption']);
+                                  },
                                   icon: Icon(
                                     EvaIcons.moreVertical,
                                     color: constantColors.whiteColor,
@@ -174,27 +282,39 @@ class FeedHelpers with ChangeNotifier {
                     Padding(
                       padding: const EdgeInsets.only(top: 0.0),
                       child: Center(
-                        child: CachedNetworkImage(
-                          height: MediaQuery.of(context).size.height * 0.45,
-                          width: MediaQuery.of(context).size.width,
-                          imageBuilder: (context, imageProvider) => Container(
+                        child: GestureDetector(
+                          onDoubleTap: (() {
+                            print('added like');
+                            Provider.of<PostFunctions>(context, listen: false)
+                                .addLikes(
+                                    context,
+                                    documnetSnapshot['caption'],
+                                    Provider.of<Authentication>(context,
+                                            listen: false)
+                                        .getuserUid);
+                          }),
+                          child: CachedNetworkImage(
                             height: MediaQuery.of(context).size.height * 0.45,
                             width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              image: DecorationImage(
-                                  image: imageProvider, fit: BoxFit.cover),
+                            imageBuilder: (context, imageProvider) => Container(
+                              height: MediaQuery.of(context).size.height * 0.45,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.cover),
+                              ),
                             ),
-                          ),
-                          progressIndicatorBuilder: (context, url, progress) =>
-                              Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 5,
-                              color: constantColors.greenColor,
-                              value: progress.progress,
+                            progressIndicatorBuilder:
+                                (context, url, progress) => Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 5,
+                                color: constantColors.greenColor,
+                                value: progress.progress,
+                              ),
                             ),
+                            imageUrl: documnetSnapshot['postimage'],
                           ),
-                          imageUrl: documnetSnapshot['postimage'],
                         ),
                       ),
                     ),
@@ -221,47 +341,71 @@ class FeedHelpers with ChangeNotifier {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 30.0),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              Provider.of<PostFunctions>(context, listen: false)
-                                  .showLikes(
-                                      context, documnetSnapshot['caption']);
-                            },
-                            onTap: (() {
-                              print('added like');
-                              Provider.of<PostFunctions>(context, listen: false)
-                                  .addLikes(
-                                      context,
-                                      documnetSnapshot['caption'],
-                                      Provider.of<Authentication>(context,
-                                              listen: false)
-                                          .getuserUid);
-                            }),
-                            child: Container(
+                          child: Container(
                               height: 30,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      FontAwesomeIcons.heart,
-                                      color: constantColors.redColor,
-                                      size: 22,
-                                    ),
-                                    StreamBuilder<QuerySnapshot>(
-                                        stream: FirebaseFirestore.instance
-                                            .collection('posts')
-                                            .doc(documnetSnapshot['caption'])
-                                            .collection('likes')
-                                            .snapshots(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          } else {
-                                            return Padding(
+                              child: StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('posts')
+                                      .doc(documnetSnapshot['caption'])
+                                      .collection('likes')
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else {
+                                      return Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (() {
+                                              print('added like');
+                                              Provider.of<PostFunctions>(
+                                                      context,
+                                                      listen: false)
+                                                  .addLikes(
+                                                      context,
+                                                      documnetSnapshot[
+                                                          'caption'],
+                                                      Provider.of<Authentication>(
+                                                              context,
+                                                              listen: false)
+                                                          .getuserUid);
+                                            }),
+                                            onDoubleTap: (() {
+                                              print('delete like');
+                                              Provider.of<PostFunctions>(
+                                                      context,
+                                                      listen: false)
+                                                  .deleteLikes(
+                                                      context,
+                                                      documnetSnapshot[
+                                                          'caption'],
+                                                      Provider.of<Authentication>(
+                                                              context,
+                                                              listen: false)
+                                                          .getuserUid);
+                                            }),
+                                            child: Icon(
+                                              snapshot.data!.docs.length >= 1
+                                                  ? CupertinoIcons.heart_fill
+                                                  : CupertinoIcons.heart,
+                                              color: constantColors.redColor,
+                                              size: 25,
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Provider.of<PostFunctions>(
+                                                      context,
+                                                      listen: false)
+                                                  .showLikes(
+                                                      context,
+                                                      documnetSnapshot[
+                                                          'caption']);
+                                            },
+                                            child: Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 8.0),
                                               child: Text(
@@ -273,13 +417,14 @@ class FeedHelpers with ChangeNotifier {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 18),
                                               ),
-                                            );
-                                          }
-                                        })
-                                  ]),
-                            ),
-                          ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  })),
                         ),
+                        //cmnt
                         Padding(
                           padding: const EdgeInsets.only(right: 30.0),
                           child: GestureDetector(
@@ -331,6 +476,7 @@ class FeedHelpers with ChangeNotifier {
                             ),
                           ),
                         ),
+                        //share
                         GestureDetector(
                           onTap: () {
                             Provider.of<PostFunctions>(context, listen: false)
@@ -342,7 +488,7 @@ class FeedHelpers with ChangeNotifier {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(
-                                    FontAwesomeIcons.award,
+                                    FontAwesomeIcons.share,
                                     color: constantColors.yellowColor,
                                     size: 22,
                                   ),

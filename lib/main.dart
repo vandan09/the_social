@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_social/Altprofile/alt_profile.dart';
 import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/feed/feedHelpers.dart';
 import 'package:the_social/profile/profileHelpers.dart';
@@ -13,6 +14,7 @@ import 'package:the_social/services/Authentication.dart';
 import 'package:the_social/services/FirebaseOperation.dart';
 import 'package:the_social/utils/PostOptions.dart';
 import 'package:the_social/utils/UploadPost.dart';
+import 'package:the_social/Altprofile/alt_profile_helpers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         providers: [
+          // ChangeNotifierProvider(create: (_) => AltProfileHelpers()),
+          ChangeNotifierProvider(create: (_) => AtlProfileHelpers()),
+
           ChangeNotifierProvider(create: (_) => PostFunctions()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => UploadPost()),

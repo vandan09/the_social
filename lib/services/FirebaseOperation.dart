@@ -60,14 +60,21 @@ class FirebaseOperations with ChangeNotifier {
   }
 
   Future uploadPostData(String postId, dynamic data) async {
-    return FirebaseFirestore.instance.collection('post').doc(postId).set(data);
+    return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
   }
 
-  Future deleteUserData(String userid) async {
+  Future deleteUserData(String userid, dynamic collection) async {
     return FirebaseFirestore.instance
-        .collection('users')
+        .collection(collection)
         .doc(userid)
         .delete()
         .then((value) => null);
+  }
+
+  Future updateCaption(String postId, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .update(data);
   }
 }

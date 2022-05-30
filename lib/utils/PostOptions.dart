@@ -3,15 +3,207 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:the_social/Altprofile/alt_profile.dart';
 import 'package:the_social/constants/Constantcolors.dart';
+import 'package:the_social/profile/profile.dart';
 import 'package:the_social/services/Authentication.dart';
 import 'package:the_social/services/FirebaseOperation.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostFunctions with ChangeNotifier {
   ConstantColors constantColors = ConstantColors();
   TextEditingController commentController = TextEditingController();
+  TextEditingController updateCaption = TextEditingController();
+
+  String? imageTimePosted;
+  String? get getImageTimePosted => imageTimePosted;
+
+  showIimeAgo(dynamic timedata) {
+    Timestamp time = timedata;
+    DateTime dateTime = time.toDate();
+    imageTimePosted = timeago.format(dateTime);
+    notifyListeners();
+  }
+
+  toast(String msg) {
+    return Fluttertoast.showToast(
+        msg: msg,
+        backgroundColor: constantColors.whiteColor,
+        textColor: constantColors.darkColor);
+  }
+
+  showOptions(BuildContext context, postId) {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.15,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: constantColors.blueGreyColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 150),
+                    child: Divider(
+                      thickness: 4,
+                      color: constantColors.whiteColor,
+                    ),
+                  ),
+                  Container(
+                    child: Column(
+                      children: [
+                        MaterialButton(
+                          // color: constantColors.blueColor,
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Container(
+                                    child: Center(
+                                        child: Row(
+                                      children: [
+                                        Container(
+                                          height: 50,
+                                          width: 300,
+                                          child: TextField(
+                                            decoration: InputDecoration(
+                                              hintText: 'Add new caption',
+                                              hintStyle: TextStyle(
+                                                color:
+                                                    constantColors.whiteColor,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            style: TextStyle(
+                                              color: constantColors.whiteColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            controller: updateCaption,
+                                          ),
+                                        ),
+                                        FloatingActionButton(
+                                            backgroundColor:
+                                                constantColors.blueColor,
+                                            child: Icon(
+                                              FontAwesomeIcons.fileUpload,
+                                              color: constantColors.whiteColor,
+                                            ),
+                                            onPressed: () {
+                                              Provider.of<FirebaseOperations>(
+                                                      context,
+                                                      listen: false)
+                                                  .updateCaption(postId, {
+                                                'caption': updateCaption.text,
+                                              });
+                                            }),
+                                      ],
+                                    )),
+                                  );
+                                });
+                          },
+                          child: Text(
+                            'Edit Post',
+                            style: TextStyle(
+                              color: constantColors.whiteColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // delete
+                        MaterialButton(
+                          // color: constantColors.blueColor,
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                      'Delete this post?',
+                                      style: TextStyle(
+                                        color: constantColors.darkColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    actions: [
+                                      MaterialButton(
+                                        // color: constantColors.blueColor,
+                                        onPressed: () {
+                                          Provider.of<FirebaseOperations>(
+                                                  context,
+                                                  listen: false)
+                                              .deleteUserData(postId, 'post')
+                                              .whenComplete(() {
+                                            toast('Post deleted');
+                                          }).whenComplete(() {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(
+                                            color: constantColors.blueColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      MaterialButton(
+                                        // color: constantColors.blueColor,
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          'No',
+                                          style: TextStyle(
+                                            color: constantColors.darkColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                });
+                            // Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Delete Post',
+                            style: TextStyle(
+                              color: constantColors.whiteColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   Future addLikes(BuildContext context, String postId, subPostId) async {
     return FirebaseFirestore.instance
         .collection('posts')
@@ -29,6 +221,30 @@ class PostFunctions with ChangeNotifier {
           .getinitiUserEmail,
       'time': Timestamp.now(),
     });
+  }
+
+  Future deleteLikes(BuildContext context, String postId, subPostId) async {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(subPostId)
+        .delete();
+  }
+
+  Future<bool> checkLikes(
+      BuildContext context, String postId, subPostId) async {
+    bool check = false;
+    FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(postId)
+        .get()
+        .then((sub) => {
+              if (sub.data()!.length > 0) {check = true}
+            });
+    return check;
   }
 
   Future addComment(BuildContext context, String postId, comment) async {
@@ -113,7 +329,7 @@ class PostFunctions with ChangeNotifier {
                             child: CircularProgressIndicator(),
                           );
                         } else {
-                          return new ListView(
+                          return ListView(
                               children: snapshot.data!.docs
                                   .map((DocumentSnapshot documentSnapshot) {
                             return Container(
@@ -127,39 +343,137 @@ class PostFunctions with ChangeNotifier {
                                     children: [
                                       //image
 
-                                      CachedNetworkImage(
-                                        width: 40,
-                                        height: 40,
-                                        imageBuilder:
-                                            (context, imageProvider) =>
-                                                Container(
-                                          width: 80.0,
-                                          height: 80.0,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: imageProvider,
-                                                fit: BoxFit.cover),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor:
+                                                      constantColors
+                                                          .transperant,
+                                                  actions: [
+                                                    Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                      color: constantColors
+                                                          .blueColor,
+                                                    ))
+                                                  ],
+                                                );
+                                              });
+                                          if (documentSnapshot['userid'] !=
+                                              Provider.of<Authentication>(
+                                                      context,
+                                                      listen: false)
+                                                  .getuserUid) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AltProfile(
+                                                  useruid: documentSnapshot[
+                                                      'userid'],
+                                                ),
+                                              ),
+                                            ).whenComplete(() {
+                                              Navigator.pop(context);
+                                            });
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => Profile(),
+                                              ),
+                                            ).whenComplete(() {
+                                              Navigator.pop(context);
+                                            });
+                                          }
+                                        },
+                                        child: CachedNetworkImage(
+                                          width: 40,
+                                          height: 40,
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            width: 80.0,
+                                            height: 80.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover),
+                                            ),
                                           ),
-                                        ),
-                                        progressIndicatorBuilder:
-                                            (context, url, progress) => Center(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 5,
-                                            color: constantColors.greenColor,
-                                            value: progress.progress,
+                                          progressIndicatorBuilder:
+                                              (context, url, progress) =>
+                                                  Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 5,
+                                              color: constantColors.greenColor,
+                                              value: progress.progress,
+                                            ),
                                           ),
+                                          imageUrl:
+                                              documentSnapshot['userimage'],
                                         ),
-                                        imageUrl: documentSnapshot['userimage'],
                                       ),
                                       //name
 
-                                      Text(
-                                        documentSnapshot['username'],
-                                        style: TextStyle(
-                                            color: constantColors.whiteColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  backgroundColor:
+                                                      constantColors
+                                                          .transperant,
+                                                  actions: [
+                                                    Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                      color: constantColors
+                                                          .blueColor,
+                                                    ))
+                                                  ],
+                                                );
+                                              });
+                                          if (documentSnapshot['userid'] !=
+                                              Provider.of<Authentication>(
+                                                      context,
+                                                      listen: false)
+                                                  .getuserUid) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AltProfile(
+                                                  useruid: documentSnapshot[
+                                                      'userid'],
+                                                ),
+                                              ),
+                                            ).whenComplete(() {
+                                              Navigator.pop(context);
+                                            });
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => Profile(),
+                                              ),
+                                            ).whenComplete(() {
+                                              Navigator.pop(context);
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          documentSnapshot['username'],
+                                          style: TextStyle(
+                                              color: constantColors.whiteColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12),
+                                        ),
                                       ),
                                       //3 button
                                       Container(
@@ -353,48 +667,131 @@ class PostFunctions with ChangeNotifier {
                             child: CircularProgressIndicator(),
                           );
                         } else {
-                          return new ListView(
+                          return ListView(
                             children: snapshot.data!.docs
                                 .map((DocumentSnapshot documentSnapshot) {
                               return ListTile(
-                                leading: CachedNetworkImage(
-                                  width: 40,
-                                  height: 40,
-                                  imageBuilder: (context, imageProvider) =>
-                                      Container(
-                                    width: 80.0,
-                                    height: 80.0,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover),
+                                // image
+                                leading: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor:
+                                                constantColors.transperant,
+                                            actions: [
+                                              Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                color: constantColors.blueColor,
+                                              ))
+                                            ],
+                                          );
+                                        });
+                                    if (documentSnapshot['userid'] !=
+                                        Provider.of<Authentication>(context,
+                                                listen: false)
+                                            .getuserUid) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AltProfile(
+                                            useruid: documentSnapshot['userid'],
+                                          ),
+                                        ),
+                                      ).whenComplete(() {
+                                        Navigator.pop(context);
+                                      });
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Profile(),
+                                        ),
+                                      ).whenComplete(() {
+                                        Navigator.pop(context);
+                                      });
+                                    }
+                                  },
+                                  child: CachedNetworkImage(
+                                    width: 40,
+                                    height: 40,
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                      width: 80.0,
+                                      height: 80.0,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover),
+                                      ),
                                     ),
-                                  ),
-                                  progressIndicatorBuilder:
-                                      (context, url, progress) => Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 5,
-                                      color: constantColors.greenColor,
-                                      value: progress.progress,
+                                    progressIndicatorBuilder:
+                                        (context, url, progress) => Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 5,
+                                        color: constantColors.greenColor,
+                                        value: progress.progress,
+                                      ),
                                     ),
+                                    imageUrl: documentSnapshot['userimage'],
                                   ),
-                                  imageUrl: documentSnapshot['userimage'],
                                 ),
-                                title: Text(
-                                  documentSnapshot['username'],
-                                  style: TextStyle(
-                                      color: constantColors.whiteColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
+                                //name
+                                title: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor:
+                                                constantColors.transperant,
+                                            actions: [
+                                              Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                color: constantColors.blueColor,
+                                              ))
+                                            ],
+                                          );
+                                        });
+                                    if (documentSnapshot['userid'] !=
+                                        Provider.of<Authentication>(context,
+                                                listen: false)
+                                            .getuserUid) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AltProfile(
+                                            useruid: documentSnapshot['userid'],
+                                          ),
+                                        ),
+                                      ).whenComplete(() {
+                                        Navigator.pop(context);
+                                      });
+                                      ;
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Profile(),
+                                        ),
+                                      ).whenComplete(() {
+                                        Navigator.pop(context);
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    documentSnapshot['username'],
+                                    style: TextStyle(
+                                        color: constantColors.whiteColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
                                 ),
-                                // subtitle: Text(
-                                //   documentSnapshot['useremail'],
-                                //   style: TextStyle(
-                                //       color: constantColors.whiteColor,
-                                //       fontWeight: FontWeight.bold,
-                                //       fontSize: 16),
-                                // ),
+
                                 trailing: Provider.of<Authentication>(context,
                                                 listen: false)
                                             .getuserUid ==

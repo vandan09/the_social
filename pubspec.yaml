@@ -48,6 +48,7 @@ dependencies:
   custom_navigation_bar: ^0.8.2
   fluttertoast: ^8.0.9
   cached_network_image: ^3.2.1
+  timeago: ^3.2.2
   
 
 dev_dependencies:
