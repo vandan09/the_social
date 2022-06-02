@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_social/chat_room/chat_room_helpers.dart';
 import 'package:the_social/screens/LandingPage/LandingUtils.dart';
 import 'package:the_social/services/Authentication.dart';
 
@@ -11,8 +12,12 @@ class FirebaseOperations with ChangeNotifier {
   late String initUserEmail;
   String? initUserName;
   String? initUserImage;
+  String? initchatroomimage;
 
   late UploadTask imageUploadTask;
+  late UploadTask chatroomimageUploadTask;
+  String? get getinitiChatroomImage => initchatroomimage;
+
   String? get getinitiUserName => initUserName;
   String? get getinitiUserEmail => initUserEmail;
   String? get getinitiUserImage => initUserImage;
@@ -36,11 +41,38 @@ class FirebaseOperations with ChangeNotifier {
     });
   }
 
+  Future uploadChatroomAvatar(BuildContext context) async {
+    Reference chatroomimageReference = FirebaseStorage.instance.ref().child(
+        'chatroomAvatar/${Provider.of<ChatRoomHelpers>(context, listen: false).chatRoomAvatar.path}/${TimeOfDay.now()}');
+
+    chatroomimageUploadTask = chatroomimageReference.putFile(
+        Provider.of<ChatRoomHelpers>(context, listen: false).chatRoomAvatar);
+    await chatroomimageUploadTask.whenComplete(() {
+      print("chatroom image uploaded");
+    });
+
+    chatroomimageReference.getDownloadURL().then((url) {
+      Provider.of<ChatRoomHelpers>(context, listen: false).chatRoomAvatarUrl =
+          url.toString();
+      print(
+          "the chatroom avatar url=>${Provider.of<ChatRoomHelpers>(context, listen: false).chatRoomAvatar}");
+      notifyListeners();
+    });
+  }
+
   Future createUserCollection(BuildContext context, dynamic data) async {
     return FirebaseFirestore.instance
         .collection("users")
         .doc(Provider.of<Authentication>(context, listen: false).getuserUid)
         .set(data);
+  }
+
+  Future createChatroomCollection(
+      BuildContext context, String chatroomname, dynamic chatdata) async {
+    return FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(chatroomname)
+        .set(chatdata);
   }
 
   Future initUserData(BuildContext context) async {

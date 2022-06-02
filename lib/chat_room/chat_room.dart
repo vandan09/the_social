@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
+import 'package:the_social/chat_room/chat_room_helpers.dart';
+import 'package:the_social/constants/Constantcolors.dart';
 
 class ChatRoom extends StatefulWidget {
   const ChatRoom({Key? key}) : super(key: key);
@@ -10,8 +13,64 @@ class ChatRoom extends StatefulWidget {
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  ConstantColors constantColors = ConstantColors();
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: constantColors.blueGreyColor,
+        child: Icon(Icons.add, color: constantColors.greenColor),
+        onPressed: () {
+          Provider.of<ChatRoomHelpers>(context, listen: false)
+              .showChatRoomSheet(context);
+        },
+      ),
+      appBar: AppBar(
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Provider.of<ProfileHelpers>(context, listen: false)
+              //     .logoutAlertBox(context);
+            },
+            icon: Icon(
+              Icons.more_vert,
+              color: constantColors.whiteColor,
+            ),
+          ),
+        ],
+        // leading: IconButton(
+        //     onPressed: () {
+        //       // Provider.of<ProfileHelpers>(context, listen: false)
+        //       //     .logoutAlertBox(context);
+        //     },
+        //     icon: Icon(
+        //       Icons.add,
+        //       color: constantColors.greenColor,
+        //     )),
+        backgroundColor: constantColors.blueGreyColor.withOpacity(0.4),
+        title: RichText(
+          text: TextSpan(
+              text: 'Chat ',
+              style: TextStyle(
+                color: constantColors.whiteColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+              children: [
+                TextSpan(
+                  text: 'Box ',
+                  style: TextStyle(
+                    color: constantColors.blueColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                )
+              ]),
+        ),
+      ),
+      body: Provider.of<ChatRoomHelpers>(context, listen: false)
+          .showChatrooms(context),
+    );
   }
 }

@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_social/Altprofile/alt_profile.dart';
+import 'package:the_social/chat_room/chat_room.dart';
+import 'package:the_social/chat_room/chat_room_helpers.dart';
 import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/feed/feedHelpers.dart';
 import 'package:the_social/profile/profileHelpers.dart';
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
         ),
         providers: [
           // ChangeNotifierProvider(create: (_) => AltProfileHelpers()),
+          ChangeNotifierProvider(create: (_) => ChatRoomHelpers()),
+
           ChangeNotifierProvider(create: (_) => AtlProfileHelpers()),
 
           ChangeNotifierProvider(create: (_) => PostFunctions()),
