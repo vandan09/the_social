@@ -6,6 +6,7 @@ import 'package:the_social/chat_room/chat_room.dart';
 import 'package:the_social/chat_room/chat_room_helpers.dart';
 import 'package:the_social/constants/Constantcolors.dart';
 import 'package:the_social/feed/feedHelpers.dart';
+import 'package:the_social/message/group_message_helper.dart';
 import 'package:the_social/profile/profileHelpers.dart';
 import 'package:the_social/screens/HomePage/HomePageHelpers.dart';
 import 'package:the_social/screens/LandingPage/LandingHelpers.dart';
@@ -39,11 +40,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         providers: [
-          // ChangeNotifierProvider(create: (_) => AltProfileHelpers()),
+          ChangeNotifierProvider(create: (_) => GroupMessageHelpers()),
           ChangeNotifierProvider(create: (_) => ChatRoomHelpers()),
-
           ChangeNotifierProvider(create: (_) => AtlProfileHelpers()),
-
           ChangeNotifierProvider(create: (_) => PostFunctions()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => UploadPost()),

@@ -26,28 +26,28 @@ class _ChatRoomState extends State<ChatRoom> {
         },
       ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
-              // Provider.of<ProfileHelpers>(context, listen: false)
-              //     .logoutAlertBox(context);
+              // print('eneter');
+              Provider.of<ChatRoomHelpers>(context, listen: false)
+                  .showApproveSheet(context);
             },
+            icon: Icon(
+              Icons.notifications,
+              color: constantColors.whiteColor,
+            ),
+          ),
+          IconButton(
+            onPressed: () {},
             icon: Icon(
               Icons.more_vert,
               color: constantColors.whiteColor,
             ),
           ),
         ],
-        // leading: IconButton(
-        //     onPressed: () {
-        //       // Provider.of<ProfileHelpers>(context, listen: false)
-        //       //     .logoutAlertBox(context);
-        //     },
-        //     icon: Icon(
-        //       Icons.add,
-        //       color: constantColors.greenColor,
-        //     )),
         backgroundColor: constantColors.blueGreyColor.withOpacity(0.4),
         title: RichText(
           text: TextSpan(
